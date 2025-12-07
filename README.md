@@ -147,9 +147,9 @@ If you use this tool in your research, please cite:
 ```bibtex
 @article{neural_scaling_probe_2024,
   title={Predicting Neural Scaling Laws from Data Geometry},
-  author={Anonymous},
+  author={Sandro Andric},
   journal={arXiv preprint},
-  year={2024}
+  year={2025}
 }
 ```
 
