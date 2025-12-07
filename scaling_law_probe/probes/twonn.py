@@ -44,8 +44,15 @@ def twonn_id(
         - Robust to noise and works well in high dimensions
         - Requires no hyperparameters beyond k1, k2
         - Recommended: n_samples >= 1000 for reliable estimates
+        - Duplicate embeddings are automatically deduplicated
     """
+    # Deduplicate embeddings (duplicates cause zero distances)
+    embeddings = np.unique(embeddings, axis=0)
     N = embeddings.shape[0]
+
+    # Need at least 3 unique points for TwoNN
+    if N < 3:
+        return np.nan
 
     # Subsample if needed (for large datasets)
     if subsample and N > subsample:
@@ -58,17 +65,23 @@ def twonn_id(
     distances = squareform(pdist(embeddings, metric='euclidean'))
 
     # Compute ratios r2/r1 for each point
+    # Note: sorted_dists[0] is self-distance (0), so we use k1+1 and k2+1
     ratios = []
     for i in range(N):
         sorted_dists = np.sort(distances[i])
-        r1 = sorted_dists[k1]  # Distance to k1-th neighbor
-        r2 = sorted_dists[k2]  # Distance to k2-th neighbor
-        if r1 > 0:
+        # Skip zero distances (self and duplicates)
+        nonzero_dists = sorted_dists[sorted_dists > 1e-10]
+        if len(nonzero_dists) >= 2:
+            r1 = nonzero_dists[0]  # Distance to nearest neighbor
+            r2 = nonzero_dists[1]  # Distance to 2nd nearest neighbor
             ratios.append(r2 / r1)
 
     ratios = np.array(ratios)
 
-    # Filter out ratios <= 1 (shouldn't happen with k2 > k1, but numerical safety)
+    if len(ratios) == 0:
+        return np.nan
+
+    # Filter out ratios <= 1 (edge cases)
     log_ratios = np.log(ratios[ratios > 1])
 
     if len(log_ratios) == 0:
