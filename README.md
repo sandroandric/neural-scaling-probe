@@ -145,10 +145,10 @@ python -m scaling_law_probe --file data.txt --confidence
 If you use this tool in your research, please cite:
 
 ```bibtex
-@article{neural_scaling_probe_2024,
+@article{neural_scaling_probe_2025,
   title={Predicting Neural Scaling Laws from Data Geometry},
   author={Sandro Andric},
-  journal={arXiv preprint},
+  journal={Zenodo preprint},
   year={2025}
 }
 ```
